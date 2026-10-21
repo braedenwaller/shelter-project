@@ -36,7 +36,7 @@ Sidebar filters (species, intake years, intake type, measure, minimum group size
 ## Key findings (Oct 2013 - May 2025)
 
 1. Half of all dogs and cats leave within 6 days, but mostly by going home to an owner or to a rescue partner.
-   Among animals that are **adopted**, the median wait is 9 days for dogs and 24 days for cats.
+   Among animals that are **adopted**, the median wait is 9 days for dogs and 25 days for cats.
 2. **Breed is the biggest single factor for dogs.** Adopted pit-bull-type dogs wait a median 28 days vs 8 days for all other dogs.
 3. **Senior dogs are the most at-risk group**: only 29% are adopted, and those that are wait 21 days.
 4. **Kittens "wait" 30 days, mostly to grow up** to adoption age; intact cats wait twice as long as already-fixed cats.

@@ -32,7 +32,7 @@ Also say once: "Mean stay is 22 days, median is 6: the distribution is very skew
 ## 3:00 - 6:00  Live demo and key finding
 
 1. **Overview tab.** Point at the metrics. "Half of all animals leave in 6 days, but that's mostly returns to owner
-   and transfers. For animals that get *adopted*, the median is 9 days for dogs and 24 for cats."
+   and transfers. For animals that get *adopted*, the median is 9 days for dogs and 25 for cats."
    Headline chart: "Senior dogs and senior cats wait longest; kittens look slow but they're growing up to 8 weeks."
    Outcome mix: "Short isn't always good: 46% of senior dogs go back to an owner, but their euthanasia share is the
    highest of any dog age band."

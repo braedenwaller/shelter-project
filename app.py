@@ -569,10 +569,13 @@ with tab_data:
             f"({r['matching']['extra_outcomes_in_same_stay']} cases) is a duplicate record and is ignored. "
             "With this rule **no stay has a negative length**."
         )
-        example_id = (stays["animal_id"].value_counts().pipe(lambda s: s[s == 3]).index.min())
+        three = stays.groupby("animal_id")["has_outcome"].agg(["size", "all"])
+        example_id = three[(three["size"] == 3) & three["all"]].index.min()
         ex = stays[stays["animal_id"] == example_id][["animal_id", "stay_number", "intake_dt", "intake_type",
                                                        "outcome_dt", "outcome_group", "los_days"]]
-        st.markdown(f"Example: animal **{example_id}** has three stays. The naive join would give it 3 x 3 = 9 rows.")
+        n_out = int(ex["has_outcome"].sum()) if "has_outcome" in ex else len(ex)
+        st.markdown(f"Example: animal **{example_id}** has three stays and three outcomes. The naive join would give "
+                    f"it 3 x {n_out} = {3 * n_out} rows, six of them pairing an intake with the wrong outcome.")
         st.dataframe(ex.round(1), hide_index=True)
 
     with st.expander("4. Stays with no outcome recorded (right-censoring)"):
@@ -600,7 +603,7 @@ with tab_data:
         recent = stays[(stays["adopted"]) & (stays["intake_dt"] >= "2023-01-01")]
         a = recent.groupby("intake_month_start")["los_days"].median().rename("All adopted animals")
         b = (recent[recent["intake_dt"] <= AS_OF - pd.Timedelta(days=180)]
-             .groupby("intake_month_start")["los_days"].median().rename("Only intakes with 180+ days of follow-up"))
+             .groupby("intake_month_start")["los_days"].median().rename("180+ days of follow-up only"))
         demo = pd.concat([a, b], axis=1).reset_index().melt("intake_month_start", var_name="rule", value_name="median").dropna()
         demo_chart = alt.Chart(demo).mark_line(strokeWidth=2, point=alt.OverlayMarkDef(size=40)).encode(
             x=alt.X("intake_month_start:T", title="Month of intake"),
