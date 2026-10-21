@@ -382,8 +382,11 @@ with tab_explore:
         st.caption("This curve uses **every stay** (not just adopted animals) and counts animals with no recorded "
                    "outcome as 'still waiting' only for the days we actually observed them, rather than dropping them. "
                    "Pick up to four groups to compare.")
-        levels_available = [l for l in (order or fac_summary[factor].drop_duplicates().tolist())
-                            if l in set(fac_summary[factor])]
+        if order is None:   # no natural order: offer the biggest groups first
+            by_size = fac_summary.groupby(factor)["n"].sum().sort_values(ascending=False).index.tolist()
+            levels_available = by_size
+        else:
+            levels_available = [l for l in order if l in set(fac_summary[factor])]
         default_levels = levels_available[:3]
         chosen = st.multiselect("Groups to compare", levels_available, default=default_levels, max_selections=4)
         curve_rows = []
@@ -553,7 +556,7 @@ with tab_data:
             f"kind of animal (often a neonate), and guessing would hide that."
         )
         st.dataframe(pd.DataFrame({"Raw text": ["1 week", "1 month", "1 year", "7 years", "0 years", "-1 years"],
-                                   "Days": [7, 30.4, 365.3, 2556.8, "unknown", "unknown"],
+                                   "Days": ["7", "30.4", "365.3", "2556.8", "unknown", "unknown"],
                                    "Age band": ["Under 6 months", "Under 6 months", "6 months - 2 years", "7+ years",
                                                 "Unknown", "Unknown"]}), hide_index=True)
 
@@ -576,7 +579,7 @@ with tab_data:
         n_out = int(ex["has_outcome"].sum()) if "has_outcome" in ex else len(ex)
         st.markdown(f"Example: animal **{example_id}** has three stays and three outcomes. The naive join would give "
                     f"it 3 x {n_out} = {3 * n_out} rows, six of them pairing an intake with the wrong outcome.")
-        st.dataframe(ex.round(1), hide_index=True)
+        st.dataframe(ex.assign(los_days=ex["los_days"].round(1)), hide_index=True)
 
     with st.expander("4. Stays with no outcome recorded (right-censoring)"):
         open_by_year = pd.DataFrame({"Intake year": list(r["stays"]["open_by_intake_year"].keys()),
