@@ -1,0 +1,165 @@
+{
+  "raw_rows": {
+    "intakes": 173812,
+    "outcomes": 173775
+  },
+  "raw_missing_intakes": {
+    "Animal ID": 0,
+    "Name": 49991,
+    "DateTime": 0,
+    "MonthYear": 0,
+    "Found Location": 0,
+    "Intake Type": 0,
+    "Intake Condition": 0,
+    "Animal Type": 0,
+    "Sex upon Intake": 1,
+    "Age upon Intake": 0,
+    "Breed": 0,
+    "Color": 0
+  },
+  "raw_missing_outcomes": {
+    "Animal ID": 0,
+    "Date of Birth": 0,
+    "Name": 49784,
+    "DateTime": 0,
+    "MonthYear": 0,
+    "Outcome Type": 46,
+    "Outcome Subtype": 94115,
+    "Animal Type": 0,
+    "Sex upon Outcome": 1,
+    "Age upon Outcome": 9,
+    "Breed": 0,
+    "Color": 0
+  },
+  "animal_type_counts": {
+    "Dog": 94608,
+    "Cat": 69324,
+    "Other": 8968,
+    "Bird": 878,
+    "Livestock": 34
+  },
+  "outcome_rows_with_utc_offset": 3584,
+  "unparsed_dates": {
+    "intakes": 0,
+    "outcomes": 0
+  },
+  "outcomes_stamped_midnight": 3788,
+  "date_range": {
+    "intakes": [
+      "2013-10-01 07:51:00",
+      "2025-05-04 23:44:00"
+    ],
+    "outcomes": [
+      "2013-10-01 09:31:00",
+      "2025-05-05 07:22:00"
+    ]
+  },
+  "exact_duplicate_rows": {
+    "intakes": 36,
+    "outcomes": 26
+  },
+  "same_animal_same_time_duplicates": {
+    "intakes": 6,
+    "outcomes": 1
+  },
+  "rows_dropped_not_dog_or_cat": 9875,
+  "age_zero_years_rows": 1197,
+  "age_negative_rows": 9,
+  "age_unknown_after_parse": 1206,
+  "naive_join": {
+    "rows": 211165,
+    "pairs_with_outcome_before_intake": 24776
+  },
+  "matching": {
+    "outcomes_before_first_intake": 1443,
+    "extra_outcomes_in_same_stay": 78
+  },
+  "as_of_date": "2025-05-05",
+  "stays": {
+    "total": 163895,
+    "with_outcome": 162358,
+    "open": 1537,
+    "open_by_intake_year": {
+      "2013": 2,
+      "2014": 49,
+      "2015": 64,
+      "2016": 56,
+      "2017": 115,
+      "2018": 110,
+      "2019": 106,
+      "2020": 27,
+      "2021": 15,
+      "2022": 20,
+      "2023": 28,
+      "2024": 145,
+      "2025": 800
+    },
+    "animals": 146450,
+    "animals_with_repeat_stays": 13421,
+    "max_stays_one_animal": 33,
+    "negative_los": 0,
+    "los_over_365": 568
+  },
+  "los_summary": {
+    "median": 6.208333333333333,
+    "mean": 21.98324352208859,
+    "p90": 57.148125000000014,
+    "max": 1912.9381944444444
+  },
+  "missing_name_share_by_intake_type": {
+    "Abandoned": 0.19,
+    "Euthanasia Request": 0.053,
+    "Owner Surrender": 0.094,
+    "Public Assist": 0.068,
+    "Stray": 0.321,
+    "Wildlife": 0.0
+  },
+  "missing_subtype_share_by_outcome": {
+    "Adoption": 0.782,
+    "Died": 0.029,
+    "Disposal": 0.984,
+    "Euthanasia": 0.007,
+    "Lost": 1.0,
+    "Missing": 0.179,
+    "Relocate": 1.0,
+    "Return to Owner": 0.989,
+    "Rto-Adopt": 1.0,
+    "Stolen": 1.0,
+    "Transfer": 0.0
+  },
+  "condition_groups": {
+    "Normal": "Normal",
+    "Injured": "Injured",
+    "Sick": "Sick / medical",
+    "Medical": "Sick / medical",
+    "Med Attn": "Sick / medical",
+    "Med Urgent": "Sick / medical",
+    "Parvo": "Sick / medical",
+    "Panleuk": "Sick / medical",
+    "Neurologic": "Sick / medical",
+    "Agonal": "Sick / medical",
+    "Congenital": "Sick / medical",
+    "Nursing": "Nursing / neonatal / pregnant",
+    "Neonatal": "Nursing / neonatal / pregnant",
+    "Pregnant": "Nursing / neonatal / pregnant",
+    "Aged": "Aged",
+    "Behavior": "Behavioral / feral",
+    "Feral": "Behavioral / feral",
+    "Other": "Other / unknown",
+    "Unknown": "Other / unknown",
+    "Space": "Other / unknown"
+  },
+  "outcome_groups": {
+    "Adoption": "Adoption",
+    "Transfer": "Transfer to partner",
+    "Return to Owner": "Return to owner",
+    "Rto-Adopt": "Return to owner",
+    "Euthanasia": "Euthanasia",
+    "Died": "Died in care",
+    "Disposal": "Died in care",
+    "Missing": "Other / unknown",
+    "Stolen": "Other / unknown",
+    "Lost": "Other / unknown",
+    "Relocate": "Other / unknown"
+  }
+}
