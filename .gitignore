@@ -14,3 +14,6 @@ __pycache__/
 
 # Streamlit secrets (none used, but never commit them)
 .streamlit/secrets.toml
+
+# Local editor/tool settings
+.claude/
