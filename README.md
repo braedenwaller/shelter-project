@@ -8,9 +8,7 @@ A Streamlit app for CMSE 830 (Fall 2026) about how long dogs and cats wait to be
 
 ## How to run the app
 
-**Option 1: open it online.** Live app: _link coming soon_
-
-**Option 2: run it on your own computer.** This needs Python 3.10 or newer. Open a terminal and run these four commands, one at a time:
+The app runs on your own computer. This needs Python 3.10 or newer. Open a terminal and run these four commands, one at a time:
 
 ```
 git clone https://github.com/braedenwaller/shelter-project.git
