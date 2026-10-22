@@ -3,7 +3,7 @@
 An interactive Streamlit data story built for **CMSE 830 (Fall 2026, MSU)**.
 
 > **Live app:** _add your Streamlit Community Cloud link here after deploying_
-> **Run locally:** see [Setup](#setup-and-run) below (takes about two minutes).
+> **Run locally:** see [Setup](#setup-and-run) below.
 
 ## The question and who it is for
 
