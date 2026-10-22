@@ -1,5 +1,5 @@
-streamlit>=1.40
+streamlit>=1.58
 pandas>=2.2
 numpy>=1.26
-altair>=5.3
+altair>=6.0
 pyarrow>=15
