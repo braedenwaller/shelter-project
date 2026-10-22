@@ -1,11 +1,3 @@
-"""
-Who Waits Longest?  -  Length of stay at Austin Animal Center
-CMSE 830 midterm project (Fall 2026)
-
-Run with:  streamlit run app.py
-Data:      data/processed/stays.parquet  (built by src/prepare_data.py)
-"""
-
 from __future__ import annotations
 
 import json
@@ -16,16 +8,10 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-# ----------------------------------------------------------------------------
-# Page setup and constants
-# ----------------------------------------------------------------------------
 st.set_page_config(page_title="Who Waits Longest?", page_icon="🐾", layout="wide")
 
 DATA_DIR = Path(__file__).resolve().parent / "data" / "processed"
 
-# Colour follows the entity everywhere in the app: dogs are always blue, cats
-# always orange.  Palette slots are taken in the validated (colour-blind-safe)
-# order of the course data-viz reference palette.
 SPECIES_ORDER = ["Dog", "Cat"]
 SPECIES_COLORS = ["#2a78d6", "#eb6834"]
 
@@ -33,14 +19,13 @@ OUTCOME_ORDER = ["Adoption", "Transfer to partner", "Return to owner",
                  "Euthanasia", "Died in care", "Other / unknown"]
 OUTCOME_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]
 
-LEVEL_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]   # for up-to-4 user-chosen groups
+LEVEL_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
 
 AGE_ORDER = ["Under 6 months", "6 months - 2 years", "2 - 7 years", "7+ years", "Unknown"]
 SEASON_ORDER = ["Winter", "Spring", "Summer", "Fall"]
 CONDITION_ORDER = ["Normal", "Injured", "Sick / medical", "Nursing / neonatal / pregnant",
                    "Aged", "Behavioral / feral", "Other / unknown"]
 
-# The factors a user can explore, and how each one is labelled.
 FACTORS = {
     "Age at intake": "age_group",
     "Intake type": "intake_type",
@@ -65,15 +50,11 @@ MEASURES = {
 }
 
 
-# ----------------------------------------------------------------------------
-# Data loading
-# ----------------------------------------------------------------------------
 @st.cache_data(show_spinner="Loading shelter stays...")
 def load_data() -> tuple[pd.DataFrame, dict]:
     stays = pd.read_parquet(DATA_DIR / "stays.parquet")
     with open(DATA_DIR / "quality_report.json") as fh:
         report = json.load(fh)
-    # Small display helpers that are easier to build here than in the pipeline.
     stays["name_label"] = np.where(stays["arrived_with_name"], "Had a name", "No name")
     stays["visit_label"] = np.where(stays["stay_number"] == 1, "First visit", "Repeat visit")
     stays["intake_month_start"] = stays["intake_dt"].dt.to_period("M").dt.to_timestamp()
@@ -89,12 +70,7 @@ stays, report = load_data()
 AS_OF = pd.Timestamp(report["as_of_date"])
 
 
-# ----------------------------------------------------------------------------
-# Small analysis helpers
-# ----------------------------------------------------------------------------
 def summarise(df: pd.DataFrame, by: list[str], value: str = "los_days") -> pd.DataFrame:
-    """Median, quartiles and count of `value` per group.  Medians, not means:
-    stays are heavily right-skewed (mean 22 days vs median 6)."""
     g = df.groupby(by, observed=True)[value]
     out = g.agg(median="median", n="size").reset_index()
     out["q25"] = g.quantile(0.25).values
@@ -105,7 +81,6 @@ def summarise(df: pd.DataFrame, by: list[str], value: str = "los_days") -> pd.Da
 
 
 def outcome_mix(df: pd.DataFrame, by: list[str]) -> pd.DataFrame:
-    """Share of each outcome group within each `by` group (closed stays only)."""
     closed = df[df["has_outcome"]]
     counts = closed.groupby(by + ["outcome_group"], observed=True).size().rename("n").reset_index()
     counts["share"] = counts["n"] / counts.groupby(by)["n"].transform("sum")
@@ -116,10 +91,6 @@ def outcome_mix(df: pd.DataFrame, by: list[str]) -> pd.DataFrame:
 
 
 def still_waiting_curve(time_days: np.ndarray, event: np.ndarray, horizon: int = 120) -> np.ndarray:
-    """Kaplan-Meier estimate of the share of animals still at the shelter after
-    each day 0..horizon.  Open stays are *censored* at the data's end date
-    (they count as 'still waiting' only for the days we actually observed
-    them), instead of being dropped."""
     t = np.asarray(time_days, dtype=float)
     e = np.asarray(event, dtype=bool)
     order = np.argsort(t, kind="mergesort")
@@ -145,9 +116,6 @@ def species_color(n_species: int):
                      legend=alt.Legend(orient="top") if n_species > 1 else None)
 
 
-# ----------------------------------------------------------------------------
-# Chart builders (all take small, pre-aggregated frames)
-# ----------------------------------------------------------------------------
 def median_bar_chart(summary: pd.DataFrame, cat_col: str, cat_title: str, measure_label: str,
                      order: list[str] | None, n_species: int, height: int | None = None) -> alt.Chart:
     if order is None:
@@ -212,9 +180,6 @@ def waiting_curve_chart(curves: pd.DataFrame, group_title: str, facet_species: b
     return chart.configure_view(strokeWidth=0)
 
 
-# ----------------------------------------------------------------------------
-# Sidebar: one filter row that scopes every chart
-# ----------------------------------------------------------------------------
 with st.sidebar:
     st.title("🐾 Who Waits Longest?")
     st.caption("Length of stay at Austin Animal Center, Oct 2013 - May 2025")
@@ -242,7 +207,6 @@ with st.sidebar:
                "Data: City of Austin Open Data Portal. "
                "See the **Data & decisions** tab for how the two raw files became one table of stays.")
 
-# Apply the global filters once.
 if not species_sel:
     species_sel = SPECIES_ORDER
 mask = (stays["species"].isin(species_sel)
@@ -257,12 +221,9 @@ else:
     measure_label = "days until leaving"
 n_species = len(species_sel)
 
-# ----------------------------------------------------------------------------
-# Header
-# ----------------------------------------------------------------------------
 st.title("Who waits longest at the animal shelter?")
 st.markdown(
-    "Austin Animal Center is the largest no-kill shelter in the United States, and the city publishes a "
+    "Austin Animal Center is a no-kill shelter: 96% of the dogs and cats in this data left alive. The city publishes a "
     "record of **every animal that comes in and every animal that leaves**. This app matches those two "
     "records to answer one question for shelter staff, foster volunteers and would-be adopters: "
     "**which dogs and cats wait longest for a home, and what moves the wait?**"
@@ -274,9 +235,6 @@ if len(view) == 0:
 tab_overview, tab_explore, tab_trends, tab_data, tab_findings = st.tabs(
     ["Overview", "Explore a factor", "Trends over time", "Data & decisions", "Findings & limits"])
 
-# ============================================================================
-# TAB 1  -  Overview
-# ============================================================================
 with tab_overview:
     st.subheader("How to use this app")
     st.markdown(
@@ -318,7 +276,7 @@ with tab_overview:
         )
         if measure == "adoption" and "Cat" in species_sel:
             st.info("Kittens under 6 months look like they wait a long time for adoption, but most arrive only days "
-                    "or weeks old and legally cannot be adopted until they are about 8 weeks old and 2 lb. "
+                    "or weeks old, and shelters usually do not adopt out kittens until about 8 weeks old. "
                     "Their 'wait' is mostly growing up in foster care. See **Findings & limits**.", icon="ℹ️")
     else:
         st.info("No age group has enough stays under the current filters. Lower the minimum group size.")
@@ -335,9 +293,6 @@ with tab_overview:
         st.dataframe(mix.pivot_table(index=["species", "age_group"], columns="outcome_group", values="share",
                                      observed=True).reindex(columns=OUTCOME_ORDER).style.format("{:.1%}", na_rep="-"))
 
-# ============================================================================
-# TAB 2  -  Explore a factor
-# ============================================================================
 with tab_explore:
     st.subheader("Compare the wait across any factor")
     st.markdown("Pick a factor. The first chart shows the **median wait** per group, the second shows **how quickly "
@@ -377,12 +332,11 @@ with tab_explore:
                     f"n = {int(hi['n']):,}). Shortest: **{lo[factor]}** ({lo['species'].lower()}s, median "
                     f"{fmt_days(lo['median'])}, n = {int(lo['n']):,}).")
 
-        # --- Still-waiting curves -------------------------------------------
         st.markdown(f"#### How quickly do they leave? Share still at the shelter, day by day")
         st.caption("This curve uses **every stay** (not just adopted animals) and counts animals with no recorded "
                    "outcome as 'still waiting' only for the days we actually observed them, rather than dropping them. "
                    "Pick up to four groups to compare.")
-        if order is None:   # no natural order: offer the biggest groups first
+        if order is None:
             by_size = fac_summary.groupby(factor)["n"].sum().sort_values(ascending=False).index.tolist()
             levels_available = by_size
         else:
@@ -410,7 +364,6 @@ with tab_explore:
         else:
             st.info("Choose at least one group with enough stays to draw a curve.")
 
-        # --- Outcome mix ----------------------------------------------------
         st.markdown(f"#### Where do they go? Outcome mix by {factor_label.lower()}")
         mix_src = view[view["species"] == "Dog"] if factor == "primary_breed" else view
         if factor in ("primary_breed", "primary_color"):
@@ -429,9 +382,6 @@ with tab_explore:
                                                  observed=True).reindex(columns=OUTCOME_ORDER)
                              .style.format("{:.1%}", na_rep="-"))
 
-# ============================================================================
-# TAB 3  -  Trends over time
-# ============================================================================
 with tab_trends:
     st.subheader("How the shelter has changed, 2013 - 2025")
 
@@ -473,8 +423,8 @@ with tab_trends:
     if not hide_recent and year_range[1] >= 2025:
         st.warning("The drop in 2025 is **not** real: the data ends on May 5, 2025, so only animals that left quickly "
                    "have an outcome yet. Flip the toggle above to see the fair comparison.", icon="⚠️")
-    st.caption("Dogs: the median wait for adoption roughly tripled between 2019 and 2023, matching the nationwide "
-               "post-pandemic capacity crisis in dog shelters. Cats did not show the same jump.")
+    st.caption("Dogs: the median wait for adoption rose from about 7 days for 2019 intakes to 27 days for 2023 intakes. "
+               "Cats did not show the same jump.")
 
     st.markdown("#### Live-release rate by year")
     st.caption("Share of closed stays that ended alive (adoption, return to owner, transfer). "
@@ -498,9 +448,6 @@ with tab_trends:
         st.dataframe(yearly.round(1), hide_index=True)
         st.dataframe(lr.round(3), hide_index=True)
 
-# ============================================================================
-# TAB 4  -  Data & decisions
-# ============================================================================
 with tab_data:
     r = report
     st.subheader("Where the data comes from")
@@ -668,9 +615,6 @@ with tab_data:
             "`src/download_data.py` fetches them and `src/prepare_data.py` rebuilds everything above in two seconds."
         )
 
-# ============================================================================
-# TAB 5  -  Findings & limits
-# ============================================================================
 with tab_findings:
     st.subheader("What the data says (all years, both species)")
     full = stays
@@ -685,8 +629,10 @@ with tab_findings:
     other_dog = dogs_ad[dogs_ad["primary_color"] != "Black"]["los_days"].median()
     black_cat = cats_ad[cats_ad["primary_color"] == "Black"]["los_days"].median()
     other_cat = cats_ad[cats_ad["primary_color"] != "Black"]["los_days"].median()
-    intact_cat = cats_ad[cats_ad["fixed_at_intake"] == "Intact"]["los_days"].median()
-    fixed_cat = cats_ad[cats_ad["fixed_at_intake"] == "Fixed"]["los_days"].median()
+    tiny_kitten = cats_ad[cats_ad["age_days"] <= 28]["los_days"].median()
+    older_kitten = cats_ad[(cats_ad["age_days"] >= 56) & (cats_ad["age_group"] == "Under 6 months")]["los_days"].median()
+    adult_cat = cats_ad[~kitten & (cats_ad["age_group"] != "Unknown")]["los_days"].median()
+    adult_dog = dogs_ad[(dogs_ad["age_group"] != "Under 6 months") & (dogs_ad["age_group"] != "Unknown")]["los_days"].median()
 
     st.markdown(
         f"1. **The typical stay is short, but the typical *adoption* is not.** Half of all dogs and cats leave within "
@@ -700,10 +646,10 @@ with tab_findings:
         f"adopted ({senior_dogs['outcome_group'].eq('Return to owner').mean():.0%} go home to an owner), their "
         f"euthanasia share ({senior_dogs['outcome_group'].eq('Euthanasia').mean():.1%}) is the highest of any dog age "
         f"band, and those that are adopted wait {dogs_ad[dogs_ad['age_group'] == '7+ years']['los_days'].median():.0f} days.\n"
-        f"4. **Kittens 'wait' {cats_ad[kitten]['los_days'].median():.0f} days, but mostly to grow up.** Cats aged 6 months - "
-        f"2 years wait {cats_ad[cats_ad['age_group'] == '6 months - 2 years']['los_days'].median():.0f}. Intact cats wait "
-        f"{intact_cat:.0f} days versus {fixed_cat:.0f} for cats already spayed or neutered: the surgery queue is part of the wait.\n"
-        f"5. **Dog waits tripled after the pandemic.** Median days to adoption for dogs went from {d19:.0f} (2019 intakes) "
+        f"4. **Kittens explain most of the long cat waits.** Kittens that arrive 4 weeks old or younger wait "
+        f"{tiny_kitten:.0f} days, mostly growing up in foster care, while kittens that arrive at 2 months or older wait "
+        f"{older_kitten:.0f}. Adult cats still wait a little longer than adult dogs ({adult_cat:.0f} vs {adult_dog:.0f} days).\n"
+        f"5. **Dog waits rose sharply after the pandemic.** Median days to adoption for dogs went from {d19:.0f} (2019 intakes) "
         f"to {d23:.0f} (2023 intakes). Cats did not show the same rise.\n"
         f"6. **'Black dog syndrome' does not show up here.** Black dogs wait {black_dog:.0f} days versus {other_dog:.0f} "
         f"for other colours. Black cats do wait a little longer ({black_cat:.0f} vs {other_cat:.0f} days)."

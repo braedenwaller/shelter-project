@@ -1,19 +1,5 @@
-# Raw downloads are large and re-creatable with src/download_data.py
 data/raw/
-
-# Python
 __pycache__/
-*.pyc
 .ipynb_checkpoints/
-.virtual_documents/
-
-# OS / editor
 .DS_Store
-.vscode/
-.idea/
-
-# Streamlit secrets (none used, but never commit them)
-.streamlit/secrets.toml
-
-# Local editor/tool settings
 .claude/

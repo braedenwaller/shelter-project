@@ -1,22 +1,3 @@
-"""
-Download the two raw Austin Animal Center files into data/raw/.
-
-Run from the project root:
-
-    python src/download_data.py
-
-Source: City of Austin Open Data Portal (public domain)
-  Intakes  https://data.austintexas.gov/d/wter-evkm
-  Outcomes https://data.austintexas.gov/d/9t4d-g238
-
-The raw files are ~25 MB and ~20 MB and are not committed to the repository.
-The processed file the app uses (data/processed/stays.parquet) *is* committed,
-so you only need this script if you want to rebuild it from scratch with
-`python src/prepare_data.py`.  Note that the portal updates continuously, so a
-fresh download will contain newer rows than the snapshot used here
-(downloaded 2026-10-21; records run through 2025-05-05).
-"""
-
 from pathlib import Path
 from urllib.request import urlretrieve
 
